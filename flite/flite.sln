@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fliteDll", "fliteDll.vcxproj", "{FAEFFFEB-D98F-4641-A0CF-04E31C8F90F2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cmu_us_rms", "lang\cmu_us_rms\cmu_us_rms.vcxproj", "{596A15AB-57B8-4EC2-BEC5-C34689D7ED5C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tester", "tester\tester.vcxproj", "{8554533D-3D12-4CB7-AE0F-52A6CB8663D7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAEFFFEB-D98F-4641-A0CF-04E31C8F90F2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FAEFFFEB-D98F-4641-A0CF-04E31C8F90F2}.Debug|Win32.Build.0 = Debug|Win32
+		{FAEFFFEB-D98F-4641-A0CF-04E31C8F90F2}.Release|Win32.ActiveCfg = Release|Win32
+		{FAEFFFEB-D98F-4641-A0CF-04E31C8F90F2}.Release|Win32.Build.0 = Release|Win32
+		{596A15AB-57B8-4EC2-BEC5-C34689D7ED5C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{596A15AB-57B8-4EC2-BEC5-C34689D7ED5C}.Debug|Win32.Build.0 = Debug|Win32
+		{596A15AB-57B8-4EC2-BEC5-C34689D7ED5C}.Release|Win32.ActiveCfg = Release|Win32
+		{596A15AB-57B8-4EC2-BEC5-C34689D7ED5C}.Release|Win32.Build.0 = Release|Win32
+		{8554533D-3D12-4CB7-AE0F-52A6CB8663D7}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8554533D-3D12-4CB7-AE0F-52A6CB8663D7}.Debug|Win32.Build.0 = Debug|Win32
+		{8554533D-3D12-4CB7-AE0F-52A6CB8663D7}.Release|Win32.ActiveCfg = Release|Win32
+		{8554533D-3D12-4CB7-AE0F-52A6CB8663D7}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
