@@ -112,10 +112,10 @@ namespace FlitePlugin
         gPluginManager->UnloadPlugin( GetName() );
     };
 
-    bool CPluginFlite::Init( SSystemGlobalEnvironment& env, SSystemInitParams& startupParams, IPluginBase* pPluginManager )
+    bool CPluginFlite::Init( SSystemGlobalEnvironment& env, SSystemInitParams& startupParams, IPluginBase* pPluginManager, const char* sPluginDirectory )
     {
         gPluginManager = ( PluginManager::IPluginManager* )pPluginManager->GetConcreteInterface( NULL );
-        CPluginBase::Init( env, startupParams, pPluginManager );
+        CPluginBase::Init( env, startupParams, pPluginManager, sPluginDirectory );
 
         // Register CVars/Commands
         if ( gEnv && gEnv->pConsole )
