@@ -27,7 +27,7 @@ namespace FlitePlugin
             ~CPluginFlite();
 
             // IPluginBase
-            void Release();
+            bool Release( bool bForce );
 
             int GetInitializationMode() const
             {
