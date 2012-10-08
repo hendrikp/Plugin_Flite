@@ -13,6 +13,8 @@ extern "C" {
 #pragma comment(lib, "../flite/lib/fliteDll.lib")
 #pragma comment(lib, "../flite/lib/cmu_us_rms.lib")
 
+#define COMMAND_SPEAK "fl_speak"
+
 namespace FlitePlugin
 {
     CPluginFlite* gPlugin = NULL;
@@ -74,7 +76,7 @@ namespace FlitePlugin
         #undef GetCommandLine
         string sCommandLine(pArgs->GetCommandLine());
         int nLen = sCommandLine.length();
-        int nLenCmd = strlen("flite_speak ");
+        int nLenCmd = strlen(COMMAND_SPEAK " ");
 
         // Is text present?
         if(nLen <= nLenCmd)
@@ -107,7 +109,7 @@ namespace FlitePlugin
             // Unregister CVars
             if ( gEnv && gEnv->pConsole )
             {
-                gEnv->pConsole->RemoveCommand( "flite_speak" );
+                gEnv->pConsole->RemoveCommand( COMMAND_SPEAK );
             }
 
             // Cleanup like this always (since the class is static its cleaned up when the dll is unloaded)
@@ -128,7 +130,7 @@ namespace FlitePlugin
         // Register CVars/Commands
         if ( gEnv && gEnv->pConsole )
         {
-            gEnv->pConsole->AddCommand( "flite_speak", Command_Speak, VF_NULL, "Speak the text" );
+            gEnv->pConsole->AddCommand( COMMAND_SPEAK, Command_Speak, VF_NULL, "Speak the text" );
         }
 
         return true;
@@ -136,23 +138,7 @@ namespace FlitePlugin
 
     const char* CPluginFlite::ListCVars() const
     {
-        return "flite_speak\n"; // TODO: Enter CVARs/Commands here if you have some
-    }
-
-    bool CPluginFlite::Check( const char* sAPIVersion ) const
-    {
-        if ( !sAPIVersion )
-        {
-            return false;
-        }
-
-        // TODO: You could add a more complex version check here (e.g. if you support multiple versions)
-        if ( SFileVersion( sAPIVersion ) == SFileVersion( "3.4.0" ) )
-        {
-            return true;
-        }
-
-        return false;
+        return COMMAND_SPEAK "\n";
     }
 
     const char* CPluginFlite::GetStatus() const
