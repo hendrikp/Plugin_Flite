@@ -19,6 +19,10 @@ namespace FlitePlugin
         */
         virtual PluginManager::IPluginBase* GetBase() = 0;
 
-        // TODO: Add your concrete interface declaration here
+        /**
+        * @brief Speak a text asynchronously
+        * @param sText Text to Speak
+        */
+        virtual void AsyncSpeak(const char* sText) = 0;
     };
 };

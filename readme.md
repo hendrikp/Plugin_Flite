@@ -19,4 +19,5 @@ CVars
 
 Flownodes
 =========
-TODO: Describe the flownodes inside your plugin
+* ```Flite_Plugin:TextToSpeech```
+  Will speak sText when Speak is triggered

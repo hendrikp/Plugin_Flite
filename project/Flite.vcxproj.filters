@@ -32,6 +32,9 @@
     <ClCompile Include="..\src\CPluginFlite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Flownodes\CFlowFliteNode.cpp">
+      <Filter>Flownodes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StdAfx.h">

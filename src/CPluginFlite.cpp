@@ -19,52 +19,6 @@ namespace FlitePlugin
 {
     CPluginFlite* gPlugin = NULL;
 
-    /** 
-    * @brief Speak text blocking
-    * @param sText Text to speak
-    * @return length
-    */
-    float BlockingSpeak(const char* sText)
-    {
-        if(!sText)
-            return 0;
-
-        flite_init();
-        cst_voice *v = register_cmu_us_rms(NULL);
-        return flite_text_to_speech(sText, v, "play");
-    }
-
-    /** 
-    * @brief Internal Threadfunction for async speaking
-    * @param sText Text to speak
-    */
-    unsigned int __stdcall _AsyncSpeak(void* sText)
-    {
-        BlockingSpeak(static_cast<const char*>(sText));
-        delete [] sText;
-        return 0;
-    }
-
-    /** 
-    * @brief Speak text async
-    * @param sText Text to speak
-    */
-    void AsyncSpeak(const char* sText)
-    {
-        if(!sText)
-            return;
-
-        // prepare for async thread
-        char* pText = new char[ strlen(sText)+1];
-        strcpy(pText, sText);
-
-        // start thread
-        unsigned int nThreadId = 0;
-        void* pThread = (void*)_beginthreadex( NULL, 0, _AsyncSpeak, static_cast<void*>(pText), CREATE_SUSPENDED, &nThreadId );
-        assert(pThread);
-        ResumeThread((HANDLE)pThread);
-    }
-
     void Command_Speak( IConsoleCmdArgs* pArgs )
     {
         if ( !gPlugin)
@@ -86,7 +40,7 @@ namespace FlitePlugin
         string sText = sCommandLine.Mid(nLenCmd);
 
         // spawn thread to synthesize and speak
-        AsyncSpeak(sText.c_str());
+        gPlugin->AsyncSpeak(sText);
     };
 
     CPluginFlite::CPluginFlite()
@@ -146,5 +100,46 @@ namespace FlitePlugin
         return "OK";
     }
 
-    // TODO: Add your plugin concrete interface implementation
+    /** 
+    * @brief Speak text blocking
+    * @param sText Text to speak
+    * @return length
+    */
+    float BlockingSpeak(const char* sText)
+    {
+        if(!sText)
+            return 0;
+
+        flite_init();
+        cst_voice *v = register_cmu_us_rms(NULL);
+        return flite_text_to_speech(sText, v, "play");
+    }
+
+    /** 
+    * @brief Internal Threadfunction for async speaking
+    * @param sText Text to speak
+    */
+    unsigned int __stdcall _AsyncSpeak(void* sText)
+    {
+        BlockingSpeak(static_cast<const char*>(sText));
+        delete [] sText;
+        return 0;
+    }
+
+    // plugin concrete interface implementation
+    void CPluginFlite::AsyncSpeak(const char* sText)
+    {
+        if(!sText)
+            return;
+
+        // prepare for async thread
+        char* pText = new char[ strlen(sText)+1];
+        strcpy(pText, sText);
+
+        // start thread
+        unsigned int nThreadId = 0;
+        void* pThread = (void*)_beginthreadex( NULL, 0, _AsyncSpeak, static_cast<void*>(pText), CREATE_SUSPENDED, &nThreadId );
+        assert(pThread);
+        ResumeThread((HANDLE)pThread);
+    }
 }
