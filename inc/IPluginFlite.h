@@ -23,6 +23,6 @@ namespace FlitePlugin
         * @brief Speak a text asynchronously
         * @param sText Text to Speak
         */
-        virtual void AsyncSpeak(const char* sText) = 0;
+        virtual void AsyncSpeak( const char* sText ) = 0;
     };
 };
