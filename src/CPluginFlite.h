@@ -76,7 +76,7 @@ namespace FlitePlugin
                 return static_cast<IPluginBase*>( this );
             };
 
-            void AsyncSpeak(const char* sText);
+            void AsyncSpeak( const char* sText );
     };
 
     extern CPluginFlite* gPlugin;
@@ -86,7 +86,7 @@ namespace FlitePlugin
 * @brief This function is required to use the Autoregister Flownode without modification.
 */
 inline void GameWarning( const char* sFormat, ... ) PRINTF_PARAMS( 1, 2 );
-inline void GameWarning(const char * sFormat, ...)
+inline void GameWarning( const char* sFormat, ... )
 {
     va_list ArgList;
     va_start( ArgList, sFormat );

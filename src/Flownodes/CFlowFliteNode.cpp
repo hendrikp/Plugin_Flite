@@ -10,56 +10,56 @@ namespace FlitePlugin
     class CFlowFliteNode :
         public CFlowBaseNode<eNCT_Instanced>
     {
-        enum EInputPorts
-        {
-            EIP_SPEAK = 0,
-            EIP_TEXT,
-        };
-
-    public:
-        virtual void GetMemoryUsage( ICrySizer* s ) const
-        {
-            s->Add( *this );
-        }
-
-        virtual IFlowNodePtr Clone( SActivationInfo* pActInfo )
-        {
-            return new CFlowFliteNode( pActInfo );
-        }
-
-        CFlowFliteNode( SActivationInfo* pActInfo )
-        {
-
-        }
-
-        virtual void GetConfiguration( SFlowNodeConfig& config )
-        {
-            static const SInputPortConfig inputs[] =
+            enum EInputPorts
             {
-                InputPortConfig_Void( "Speak", _HELP( "Speak the text" ) ),
-                InputPortConfig<string>( "sText", "", _HELP( "Text to speak" ), "sText", _UICONFIG( "" ) ),
-                {0},
+                EIP_SPEAK = 0,
+                EIP_TEXT,
             };
 
-            config.pInputPorts = inputs;
-            config.sDescription = _HELP( PLUGIN_CONSOLE_PREFIX " Text To Speech" );
-
-            config.SetCategory( EFLN_APPROVED );
-        }
-
-        virtual void ProcessEvent( EFlowEvent evt, SActivationInfo* pActInfo )
-        {
-            switch ( evt )
+        public:
+            virtual void GetMemoryUsage( ICrySizer* s ) const
             {
-            case eFE_Activate:
-                if ( gPlugin && IsPortActive( pActInfo, EIP_SPEAK ) )
-                {
-                    gPlugin->AsyncSpeak( GetPortString( pActInfo, EIP_TEXT ) );
-                }
-
-                break;
+                s->Add( *this );
             }
-        }
+
+            virtual IFlowNodePtr Clone( SActivationInfo* pActInfo )
+            {
+                return new CFlowFliteNode( pActInfo );
+            }
+
+            CFlowFliteNode( SActivationInfo* pActInfo )
+            {
+
+            }
+
+            virtual void GetConfiguration( SFlowNodeConfig& config )
+            {
+                static const SInputPortConfig inputs[] =
+                {
+                    InputPortConfig_Void( "Speak", _HELP( "Speak the text" ) ),
+                    InputPortConfig<string>( "sText", "", _HELP( "Text to speak" ), "sText", _UICONFIG( "" ) ),
+                    {0},
+                };
+
+                config.pInputPorts = inputs;
+                config.sDescription = _HELP( PLUGIN_CONSOLE_PREFIX " Text To Speech" );
+
+                config.SetCategory( EFLN_APPROVED );
+            }
+
+            virtual void ProcessEvent( EFlowEvent evt, SActivationInfo* pActInfo )
+            {
+                switch ( evt )
+                {
+                    case eFE_Activate:
+                        if ( gPlugin && IsPortActive( pActInfo, EIP_SPEAK ) )
+                        {
+                            gPlugin->AsyncSpeak( GetPortString( pActInfo, EIP_TEXT ) );
+                        }
+
+                        break;
+                }
+            }
     };
 }
 
