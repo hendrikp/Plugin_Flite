@@ -52,27 +52,34 @@ namespace FlitePlugin
 
     CPluginFlite::~CPluginFlite()
     {
+        Release( true );
+
         gPlugin = NULL;
     }
 
     bool CPluginFlite::Release( bool bForce )
     {
-        // Should be called while Game is still active otherwise there might be leaks/problems
-        bool bRet = CPluginBase::Release( bForce );
+        bool bRet = true;
 
-        if ( bRet )
+        if ( !m_bCanUnload )
         {
-            // Unregister CVars
-            if ( gEnv && gEnv->pConsole )
+            // Should be called while Game is still active otherwise there might be leaks/problems
+            bRet = CPluginBase::Release( bForce );
+
+            if ( bRet )
             {
-                gEnv->pConsole->RemoveCommand( COMMAND_SPEAK );
+                // Unregister CVars
+                if ( gEnv && gEnv->pConsole )
+                {
+                    gEnv->pConsole->RemoveCommand( COMMAND_SPEAK );
+                }
+
+                // Cleanup like this always (since the class is static its cleaned up when the dll is unloaded)
+                gPluginManager->UnloadPlugin( GetName() );
+
+                // Allow Plugin Manager garbage collector to unload this plugin
+                AllowDllUnload();
             }
-
-            // Cleanup like this always (since the class is static its cleaned up when the dll is unloaded)
-            gPluginManager->UnloadPlugin( GetName() );
-
-            // Allow Plugin Manager garbage collector to unload this plugin
-            AllowDllUnload();
         }
 
         return bRet;
