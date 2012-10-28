@@ -149,7 +149,8 @@
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)..\flite\lib\$(Platform)\fliteDll.dll" "$(OutDir)"
-copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"</Command>
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>cd $(ProjectDir)/../tools
@@ -182,7 +183,8 @@ stylecode.bat</Command>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)..\flite\lib\$(Platform)\fliteDll.dll" "$(OutDir)"
-copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"</Command>
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>cd $(ProjectDir)/../tools
@@ -219,7 +221,8 @@ stylecode.bat</Command>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)..\flite\lib\$(Platform)\fliteDll.dll" "$(OutDir)"
-copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"</Command>
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>cd $(ProjectDir)/../tools
@@ -254,7 +257,8 @@ stylecode.bat</Command>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(ProjectDir)..\flite\lib\$(Platform)\fliteDll.dll" "$(OutDir)"
-copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"</Command>
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
+copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>cd $(ProjectDir)/../tools

@@ -14,10 +14,17 @@ The plugin manager will automatically load up the plugin when the game/editor is
 
 CVars
 =====
-* ```fl_speak```
+* ```fl_speak <Text..>```
   Will speak the text supplied
+
+* ```fl_speakv <Voice> <Text..>```
+  Will speak the text with the voice supplied
+  * ```cmu_us_slt``` US female voice
+  * ```cmu_us_rms``` US male voice
 
 Flownodes
 =========
-* ```Flite_Plugin:TextToSpeech```
-  Will speak sText when Speak is triggered
+* ```Flite_Plugin:TextToSpeech``` Will speak sText
+  * In ```Speak``` Speak the text now
+  * In ```sText``` Text to speak
+  * In ```Voice``` Voice to use

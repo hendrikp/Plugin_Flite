@@ -4,6 +4,9 @@
 
 #pragma once
 
+#define FLITE_VOICE_RMS "cmu_us_rms"
+#define FLITE_VOICE_SLT "cmu_us_slt"
+
 /**
 * @brief Flite Plugin Namespace
 */
@@ -23,6 +26,6 @@ namespace FlitePlugin
         * @brief Speak a text asynchronously
         * @param sText Text to Speak
         */
-        virtual void AsyncSpeak( const char* sText ) = 0;
+        virtual void AsyncSpeak( const char* sText, const char* sVoice = FLITE_VOICE_SLT ) = 0;
     };
 };
