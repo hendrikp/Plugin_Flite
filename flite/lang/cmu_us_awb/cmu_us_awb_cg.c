@@ -7,6 +7,11 @@
 #include "cst_cart.h"
 
 extern const cst_cart * const cmu_us_awb_f0_carts[];
+extern const cst_cart cmu_us_awb_spamf0_phrase_cart;
+extern const cst_cart cmu_us_awb_spamf0_accent_cart;
+extern const float * const cmu_us_awb_spamf0_accent_vectors[];
+#define cmu_us_awb_spamf0_accent_num_channels 8
+#define cmu_us_awb_spamf0_accent_num_frames 95
 
 extern const cst_cart * const cmu_us_awb_single_mcep_carts[];
 #define cmu_us_awb_single_num_channels 114
@@ -410,11 +415,16 @@ const cst_cg_db cmu_us_awb_cg_db = {
   cmu_us_awb_f0_carts,
   cmu_us_awb_single_mcep_carts,
   NULL,NULL,
+  NULL, /* &cmu_us_awb_spamf0_accent_cart */
+  NULL, /* &cmu_us_awb_spamf0_phrase_cart */
   cmu_us_awb_single_num_channels,
   cmu_us_awb_single_num_frames,
   cmu_us_awb_single_model_vectors,
   0,0,NULL,
   0,0,NULL,
+  cmu_us_awb_spamf0_accent_num_channels,
+  cmu_us_awb_spamf0_accent_num_frames,
+  cmu_us_awb_spamf0_accent_vectors,
   cmu_us_awb_model_min,
   cmu_us_awb_model_range,
   0.005000, /* frame_advance */
@@ -430,6 +440,6 @@ const cst_cg_db cmu_us_awb_cg_db = {
   1, /* cg:mixed_excitation */
   5,48, /* filter sizes */
   cmu_us_awb_me_h,
-  2.0 /* gain */
-
+  0, /* 1, */ /* cg:spamf0 */
+  1.5 /* gain */
 };

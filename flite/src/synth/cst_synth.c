@@ -114,6 +114,33 @@ static const cst_synth_module synth_method_phones[] = {
     { NULL, NULL }
 };
 
+cst_utterance *utt_synth_wave(cst_wave *w,cst_voice *v)
+{
+    /* Create an utterance with a wave in it as if we've synthesized it */
+    /* Put it through streaming if that is require */
+    cst_utterance *u;
+    const cst_val *streaming_info_val;
+    cst_audio_streaming_info *asi = NULL;
+
+    u = new_utterance();
+    utt_init(u,v);
+    utt_set_wave(u,w);
+
+    streaming_info_val=get_param_val(u->features,"streaming_info",NULL);
+    if (streaming_info_val)
+    {
+        asi = val_audio_streaming_info(streaming_info_val);
+        asi->utt = u;
+    }
+
+    if (!asi) return u;  /* no stream */
+
+    /* Do streaming */
+    (*asi->asc)(w,0,w->num_samples,1,asi);
+
+    return u;
+}
+
 cst_utterance *apply_synth_module(cst_utterance *u,
 				  const cst_synth_module *mod)
 {
@@ -428,10 +455,12 @@ cst_utterance *default_lexical_insertion(cst_utterance *u)
     const cst_val *lex_addenda = NULL;
     const cst_val *p, *wp = NULL;
     char *phone_name;
-    char *stress = "0";
+    const char *stress = "0";
     const char *pos;
     cst_val *phones;
     cst_item *ssword, *sssyl, *segitem, *sylitem, *seg_in_syl;
+    const cst_val *vpn;
+    int dp = 0;
 
     lex = val_lexicon(feat_val(u->features,"lexicon"));
     if (lex->lex_addenda)
@@ -448,6 +477,7 @@ cst_utterance *default_lexical_insertion(cst_utterance *u)
         pos = ffeature_string(word,"pos");
 	phones = NULL;
         wp = NULL;
+        dp = 0;  /* should the phones get deleted or not */
         
         /*        printf("awb_debug word %s pos %s gpos %s\n",
                item_feat_string(word,"name"),
@@ -458,14 +488,34 @@ cst_utterance *default_lexical_insertion(cst_utterance *u)
            tokens with explicit pronunciation (or that it will
            propagate such to words, then we can remove the path here) */
 	if (item_feat_present(item_parent(item_as(word, "Token")), "phones"))
-	    phones = (cst_val *) item_feat(item_parent(item_as(word, "Token")), "phones");
+        {
+            vpn = item_feat(item_parent(item_as(word, "Token")), "phones");
+            if (cst_val_consp(vpn))
+            {   /* for SAPI ?? */
+                /* awb oct11: this seems wrong -- */
+                /* not sure SAPI still (ever) works Oct11 */
+                phones = (cst_val *) vpn;  
+            }
+            else
+            {
+                dp = 1;
+                if (cst_streq(val_string(vpn),
+                              ffeature_string(word,"p.R:Token.parent.phones")))
+                    phones = NULL; /* Already given these phones */
+                else
+                    phones = val_readlist_string(val_string(vpn));
+            }
+        }
 	else
 	{
             wp = val_assoc_string(item_feat_string(word, "name"),lex_addenda);
             if (wp)
                 phones = (cst_val *)val_cdr(val_cdr(wp));
             else
+            {
+                dp = 1;
 		phones = lex_lookup(lex,item_feat_string(word,"name"),pos);
+            }
 	}
 
 	for (sssyl=NULL,sylitem=NULL,p=phones; p; p=val_cdr(p))
@@ -504,9 +554,11 @@ cst_utterance *default_lexical_insertion(cst_utterance *u)
 	    }
 	    cst_free(phone_name);
 	}
-	if (!item_feat_present(item_parent(item_as(word, "Token")), "phones")
-            && ! wp)
+	if (dp)
+        {
 	    delete_val(phones);
+            phones = NULL;
+        }
     }
 
     return u;

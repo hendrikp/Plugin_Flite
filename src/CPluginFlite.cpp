@@ -10,8 +10,8 @@ extern "C" {
     void unregister_cmu_us_rms( cst_voice* v );
 }
 
-#pragma comment(lib, "../flite/lib/fliteDll.lib")
-#pragma comment(lib, "../flite/lib/cmu_us_rms.lib")
+#pragma comment(lib, "fliteDll.lib")
+#pragma comment(lib, "cmu_us_rms.lib")
 
 #define COMMAND_SPEAK "fl_speak"
 

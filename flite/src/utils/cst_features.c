@@ -91,6 +91,7 @@ void delete_features(cst_features *f)
 	    delete_val(n->val);
 	    cst_local_free(f->ctx,n);
 	}
+        delete_val(f->owned_strings);
 	cst_local_free(f->ctx,f);
     }
 }
@@ -227,7 +228,7 @@ void feat_set(cst_features *f, const char* name, const cst_val *val)
 
     if (val == NULL)
     {
-	cst_errmsg("cst_val: trying to set a NULL val for feature \"%s\"\n",
+	cst_errmsg("cst_features: trying to set a NULL val for feature \"%s\"\n",
 		   name);
     }
     else if (n == NULL)
@@ -235,7 +236,7 @@ void feat_set(cst_features *f, const char* name, const cst_val *val)
 	cst_featvalpair *p;
 	p = (cst_featvalpair *)cst_local_alloc(f->ctx, sizeof(*p));
 	p->next = f->head;
-	p->name = name; 
+        p->name = name;
 	p->val = val_inc_refcount(val);
 	f->head = p;
     }
@@ -258,7 +259,13 @@ int feat_copy_into(const cst_features *from,cst_features *to)
     return i;
 }
 
-int feat_print(cst_file fd,const cst_features *f)
+const char *feat_own_string(cst_features *f,const char *n)
+{
+    f->owned_strings = cons_val(string_val(n),f->owned_strings);
+    return val_string(val_car(f->owned_strings));
+}
+
+int cst_feat_print(cst_file fd,const cst_features *f)
 {
     cst_featvalpair *p;
     

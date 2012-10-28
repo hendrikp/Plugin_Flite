@@ -39,7 +39,7 @@ DIRNAME=src/synth
 BUILD_DIRS = 
 ALL_DIRS= 
 SRCS = cst_synth.c cst_utt_utils.c cst_voice.c cst_phoneset.c \
-       cst_ffeatures.c cst_ssml.c \
+       cst_ffeatures.c cst_ssml.c cst_grapheme.c \
        flite.c 
 OBJS = $(SRCS:.c=.o)
 FILES = Makefile $(SRCS)

@@ -51,6 +51,7 @@ BUILD_DIRS = pocore arm_flite m68k_flite flop
 #ORPHANED = fdlibm
 ALL_DIRS = $(BUILD_DIRS) include $(ORPHANED)
 FILES = Makefile 
+INCLUDES += -I$(TOP)/palm/include
 
 ALL = 
 

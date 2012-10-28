@@ -2,7 +2,7 @@
 ##                                                                       ##
 ##                  Language Technologies Institute                      ##
 ##                     Carnegie Mellon University                        ##
-##                      Copyright (c) 1999-2009                          ##
+##                      Copyright (c) 1999-2011                          ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -36,19 +36,23 @@
 ##                                                                       ##
 ##       Authors:  Alan W Black (awb@cs.cmu.edu)                         ##
 ##                 Kevin A. Lenzo (lenzo@cs.cmu.edu)                     ##
-##          Date:  May 2009                                              ##
-##       Version:  1.3.13 current                                        ##
+##                 and others see ACKNOWLEDGEMENTS                       ##
+##          Date:  Jan 2011                                              ##
+##       Version:  1.5 release                                           ##
 ##                                                                       ## 
 ###########################################################################
 TOP=.
 DIRNAME=
 BUILD_DIRS = include src lang doc
-ALL_DIRS=config $(BUILD_DIRS) testsuite sapi palm wince windows tools main
+ALL_DIRS=config $(BUILD_DIRS) testsuite sapi \
+         palm wince windows android \
+         tools main 
 CONFIG=configure configure.in config.sub config.guess \
        missing install-sh mkinstalldirs
 WINDOWS = Exports.def flite.sln fliteDll.vcproj
 FILES = Makefile README ACKNOWLEDGEMENTS COPYING $(CONFIG) $(WINDOWS)
-DIST_CLEAN = config.cache config.log config.status \
+DIST_CLEAN = .time-stamp $(TOP)/build/ \
+                config.cache config.log config.status \
 		config/config config/system.mak FileList
 
 HOST_ONLY_DIRS = tools main
@@ -106,11 +110,11 @@ tags:
 
 install:
 	@echo Installing 
-	mkdir -p $(INSTALLBINDIR)
-	mkdir -p $(INSTALLLIBDIR)
-	mkdir -p $(INSTALLINCDIR)
-	$(INSTALL) -m 644 include/*.h $(INSTALLINCDIR)
-	@ $(MAKE) -C main --no-print-directory install
+	mkdir -p $(DESTDIR)$(INSTALLBINDIR)
+	mkdir -p $(DESTDIR)$(INSTALLLIBDIR)
+	mkdir -p $(DESTDIR)$(INSTALLINCDIR)
+	$(INSTALL) -m 644 include/*.h $(DESTDIR)$(INSTALLINCDIR)
+	@ $(MAKE) -C main --no-print-directory DESTDIR=$(DESTDIR) install
 
 time-stamp :
 	@ echo $(PROJECT_NAME) >.time-stamp

@@ -49,6 +49,11 @@ const cst_string * const cst_ts_default_postpunctuationsymbols = "\"'`.,:;!?(){}
 
 static cst_string ts_getc(cst_tokenstream *ts);
 
+cst_string private_ts_getc(cst_tokenstream *ts)
+{
+    return ts_getc(ts);
+}
+
 static void set_charclass_table(cst_tokenstream *ts)
 {
     int i;
@@ -183,6 +188,48 @@ cst_tokenstream *ts_open_string(const cst_string *string,
     return ts;
 }
 
+cst_tokenstream *ts_open_generic(const char *filename,
+                                 const cst_string *whitespacesymbols,
+                                 const cst_string *singlecharsymbols,
+                                 const cst_string *prepunctsymbols,
+                                 const cst_string *postpunctsymbols,
+                                 void *streamtype_data,
+                                 int (*open)(cst_tokenstream *ts,
+                                             const char *filename),
+                                 void (*close)(cst_tokenstream *ts),
+                                 int (*eof)(cst_tokenstream *ts),
+                                 int (*seek)(cst_tokenstream *ts, int pos),
+                                 int (*tell)(cst_tokenstream *ts),
+                                 int (*size)(cst_tokenstream *ts),
+                                 int (*getc)(cst_tokenstream *ts))
+{   /* Its a generic token stream where user has specified the low level */
+    /* file/stream access functions                                      */
+    cst_tokenstream *ts = new_tokenstream(whitespacesymbols,
+					  singlecharsymbols,
+					  prepunctsymbols,
+					  postpunctsymbols);
+
+    ts->streamtype_data = streamtype_data;
+    ts->open = open;
+    ts->close = close;
+    ts->eof = eof;
+    ts->seek = seek;
+    ts->tell = tell;
+    ts->size = size;
+    ts->getc = getc;
+
+    if ((ts->open)(ts,filename) != 0)
+    {
+        (ts->getc)(ts);
+        return ts;
+    }
+    else
+    {
+	delete_tokenstream(ts);
+	return NULL;
+    }
+}
+
 void ts_close(cst_tokenstream *ts)
 {
     if (ts->fd != NULL)
@@ -198,6 +245,8 @@ void ts_close(cst_tokenstream *ts)
         cst_free(ts->string_buffer);
 	ts->string_buffer = NULL;
     }
+    if (ts->open)
+        (ts->close)(ts);
     delete_tokenstream(ts);
 }
 
@@ -213,7 +262,7 @@ static void get_token_sub_part(cst_tokenstream *ts,
 	       (!ts_charclass(ts->current_char,
 			      TS_CHARCLASS_SINGLECHAR,ts))); p++)
     {
-	if (p >= *buffer_max) extend_buffer(buffer,buffer_max);
+	if (p+1 >= *buffer_max) extend_buffer(buffer,buffer_max);
 	(*buffer)[p] = ts->current_char;
 	ts_getc(ts);
     }
@@ -234,7 +283,7 @@ static void get_token_sub_part_2(cst_tokenstream *ts,
 			      TS_CHARCLASS_SINGLECHAR,ts)));
          p++)
     {
-	if (p >= *buffer_max) extend_buffer(buffer,buffer_max);
+	if (p+1 >= *buffer_max) extend_buffer(buffer,buffer_max);
 	(*buffer)[p] = ts->current_char;
 	ts_getc(ts);
     }
@@ -288,17 +337,39 @@ int ts_set_stream_pos(cst_tokenstream *ts, int pos)
         else
             new_pos = pos;
     }
+    else if (ts->open)
+        new_pos = (ts->seek)(ts,pos);
     else
         new_pos = pos;  /* not sure it can get here */
     ts->file_pos = new_pos;
-    ts->current_char = ' ';  /* To be safe */
+    ts->current_char = ' ';  /* To be safe (but this is wrong) */
 
     return ts->file_pos;
 }
 
 int ts_get_stream_pos(cst_tokenstream *ts)
 {
-    return ts->file_pos;
+    if (ts->open)
+        return (ts->tell)(ts);
+    else
+        return ts->file_pos;
+}
+
+int ts_get_stream_size(cst_tokenstream *ts)
+{
+    int current_pos, end_pos;
+    if (ts->fd)
+    {
+        current_pos = ts->file_pos;
+        end_pos = (int)cst_fseek(ts->fd,(long)0,CST_SEEK_ENDREL);
+        cst_fseek(ts->fd,(long)current_pos,CST_SEEK_ABSOLUTE);
+        return end_pos;
+    } else if (ts->string_buffer)
+        return cst_strlen(ts->string_buffer);
+    else if (ts->open)
+        return (ts->size)(ts);
+    else
+        return 0;
 }
 
 static cst_string ts_getc(cst_tokenstream *ts)
@@ -314,6 +385,8 @@ static cst_string ts_getc(cst_tokenstream *ts)
 	else
 	    ts->current_char = ts->string_buffer[ts->file_pos];
     }
+    else if (ts->open)
+        ts->current_char = (ts->getc)(ts);
     
     if (ts->current_char != TS_EOF)
 	ts->file_pos++;
@@ -328,7 +401,7 @@ const cst_string *ts_get_quoted_token(cst_tokenstream *ts,
 {
     /* for reading the next quoted token that starts with quote and
        ends with quote, quote may appear only if preceded by escape */
-    int l, p;
+    int p;
 
     /* Hmm can't change quotes within a ts */
     ts->charclass[(unsigned int)quote] |= TS_CHARCLASS_QUOTE;
@@ -343,7 +416,6 @@ const cst_string *ts_get_quoted_token(cst_tokenstream *ts,
     if (ts->current_char == quote)
     {   /* go until quote */
 	ts_getc(ts);
-	l=0;
         for (p=0; ((ts->current_char != TS_EOF) &&
                    (ts->current_char != quote));
              p++)
@@ -364,14 +436,15 @@ const cst_string *ts_get_quoted_token(cst_tokenstream *ts,
         ts->token[p] = '\0';
 	ts_getc(ts);
     }
-    else /* its not quotes, like to be careful dont you */
+    else /* its not quoted, like to be careful dont you */
     {    /* treat is as standard token                  */
 	/* Get prepunctuation */
+        extend_buffer(&ts->prepunctuation,&ts->prep_max);
 	get_token_sub_part(ts,TS_CHARCLASS_PREPUNCT,
 			   &ts->prepunctuation,
 			   &ts->prep_max);
 	/* Get the symbol itself */
-	if (!ts_charclass(ts->current_char,TS_CHARCLASS_SINGLECHAR,ts))
+	if (ts_charclass(ts->current_char,TS_CHARCLASS_SINGLECHAR,ts))
 	{
 	    if (2 >= ts->token_max) extend_buffer(&ts->token,&ts->token_max);
 	    ts->token[0] = ts->current_char;
@@ -429,6 +502,8 @@ const cst_string *ts_get(cst_tokenstream *ts)
 			     &ts->token_max);
     /* This'll have token *plus* post punctuation in ts->token */
     /* Get postpunctuation */
+    if (ts->postpunctuation)
+	ts->postpunctuation[0] = '\0';
     if (ts->p_postpunctuationsymbols[0])
         get_token_postpunctuation(ts);
 

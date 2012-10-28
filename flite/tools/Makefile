@@ -43,14 +43,17 @@ OBJS = $(SRCS:.c=.o)
 TMPLTS = VOICE_ldom.c VOICE_clunits.c VOICE_diphone.c \
          VOICE_cg.c Makefile.flite 
 SCRIPTS = build_flite setup_flite huff_table flite_test \
-          make_voice_list wfst2c build_lex
+          make_voice_list wfst2c build_lex clunit_prune \
+          a2byte.pl a2short.pl a2int.pl flite_rename_voice \
+          make_lang_list
 SCM=make_lex.scm make_lts.scm make_cart.scm play_sync.scm \
     make_phoneset.scm make_vallist.scm make_clunits.scm \
     make_didb.scm make_didb2.scm make_f0lr.scm make_lts_wfst.scm \
     make_lts_rewrite.scm \
     make_cg.scm
 
-FILES = Makefile $(SCM) $(SRCS) $(SCRIPTS) $(TMPLTS) find_cmimax example.lex
+FILES = Makefile $(SCM) $(SRCS) $(SCRIPTS) $(TMPLTS) \
+        find_cmimax example.lex example.ssml
 LOCAL_INCLUDES = 
 
 ifeq ($(HOST_PLATFORM),$(TARGET_PLATFORM))
@@ -59,7 +62,7 @@ endif
 
 include $(TOP)/config/common_make_rules
 
-LOCAL_CLEAN = $(BINDIR)/find_sts $(BINDIR)/flite_sort
+LOCAL_CLEAN = $(BINDIR)/find_sts $(BINDIR)/flite_sort $(TOP)/bin
 
 $(BINDIR)/find_sts: find_sts_main.o $(FLITELIBS) 
 	$(CC) $(CFLAGS) -o $@ find_sts_main.o $(FLITELIBFLAGS) $(LDFLAGS)

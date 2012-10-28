@@ -69,6 +69,9 @@ else
 # Single model
 CSRCS += $(VOICENAME)_cg_single_mcep_trees.c $(VOICENAME)_cg_single_params.c
 endif
+ifeq ($(SPAMF0),true)
+CSRCS += $(VOICENAME)_spamf0_phrase.c $(VOICENAME)_spamf0_accent.c $(VOICENAME)_spamf0_accent_params.c
+endif
 MCEPOBJS =
 LPCOBJS =
 else
@@ -76,11 +79,11 @@ else
 CSRCS += $(VOICENAME)_clunits.c
 CSRCS += $(VOICENAME)_cltrees.c $(VOICENAME)_lpc.c $(VOICENAME)_mcep.c
 CSRCS += $(VOICENAME)_cl_durmodel.c
-MCEPSRCS = $(shell ls $(VOICENAME)_mcep_*.c)
+MCEPSRCS = $(shell if [ -f $(VOICENAME)_mcep_000.c ]; then ls $(VOICENAME)_mcep_*.c ; fi)
 MCEPOBJS = $(MCEPSRCS:.c=.o)
-LPCSRCS= $(shell ls $(VOICENAME)_lpc_*.c)
+LPCSRCS= $(shell if [ -f $(VOICENAME)_lpc_000.c ] ; then ls $(VOICENAME)_lpc_*.c; fi )
 LPCOBJS = $(LPCSRCS:.c=.o)
-RESSRCS= $(shell ls $(VOICENAME)_res_*.c)
+RESSRCS= $(shell if [ -f $(VOICENAME)_res_000.c ] ; then ls $(VOICENAME)_res_*.c; fi )
 RESOBJS = $(RESSRCS:.c=.o)
 endif
 endif
@@ -97,10 +100,10 @@ ALL += lib$(VOICENAME).so
 endif
 
 $(VOICENAME)_lpc.o: $(VOICENAME)_lpc.c
-	$(CC) -I. -I$(FLITEDIR)/include -c -o $@ $<
+	$(CC) $(CFLAGS) -I. -I$(FLITEDIR)/include -c -o $@ $<
 
 $(VOICENAME)_mcep.o: $(VOICENAME)_mcep.c
-	$(CC) -I. -I$(FLITEDIR)/include -c -o $@ $<
+	$(CC) $(CFLAGS) -I. -I$(FLITEDIR)/include -c -o $@ $<
 
 flite_$(VOICENAME): flite_main.o flite_voice_list.o $(FLITELIBS) lib$(VOICENAME).a
 	$(CC) $(CFLAGS) -o $@ flite_main.o flite_voice_list.o $(LOCAL_LIBS)  $(LOCAL_LANGLEX_LIBS) $(FLITELIBFLAGS) $(LDFLAGS)
@@ -113,4 +116,6 @@ flite_$(VOICENAME): flite_main.o flite_voice_list.o $(FLITELIBS) lib$(VOICENAME)
 flite_voice_list.c:
 	$(TOP)/tools/make_voice_list $(VOICES)
 
+voxdata : flite_$(VOICENAME)
+	./flite_$(VOICENAME) -voicedump $(VOICENAME).flitevox
 

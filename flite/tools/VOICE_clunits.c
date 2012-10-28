@@ -85,6 +85,12 @@ cst_voice *register___VOICENAME__(const char *voxdir)
     flite_feat_set_string(v->features,"join_type","simple_join");
     flite_feat_set_string(v->features,"resynth_type","fixed");
 
+    if ((voxdir != NULL) &&
+        (__VOICENAME___db.sts->sts == NULL) &&
+        (__VOICENAME___db.sts->sts_paged == NULL) &&
+        (__VOICENAME___db.sts->frames == NULL))
+        flite_mmap_clunit_voxdata(voxdir,v);
+
     /* Unit selection */
     __VOICENAME___db.unit_name_func = __VOICENAME___unit_name;
 

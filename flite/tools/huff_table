@@ -80,7 +80,7 @@ then
    infile=$2
    outfile=$3
    # Normalize the string to be compressed
-   cat $infile | awk '{print $1}' |
+   cat $infile | awk '{printf("\"%s\"\n",$1)}' |
    cat >huff.entries.corpus
    $ESTDIR/../festival/bin/festival -b $FLITEDIR/tools/make_lex.scm '(utf8entries "huff.entries.corpus" "huff.tmp.corpus")' 
 fi

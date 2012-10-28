@@ -136,9 +136,15 @@ cst_audiodev *audio_open_wince(int sps, int channels, int fmt)
     }
     wfx.nBlockAlign = wfx.nChannels*wfx.wBitsPerSample/8;
     wfx.nAvgBytesPerSec = wfx.nSamplesPerSec*wfx.nBlockAlign;
-    err = waveOutOpen(&wo,WAVE_MAPPER,&wfx,
-                      (DWORD)sndbuf_done,(DWORD)ad,
-                      CALLBACK_FUNCTION);
+    err = waveOutOpen(
+        &wo,
+        WAVE_MAPPER,
+        &wfx,
+        (DWORD_PTR)sndbuf_done,
+        (DWORD_PTR)ad,
+        CALLBACK_FUNCTION
+        );
+
     if (err != MMSYSERR_NOERROR)
     {
         cst_errmsg("Failed to open output device: %x\n", err);

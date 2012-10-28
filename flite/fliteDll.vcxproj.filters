@@ -204,6 +204,18 @@
     <ClCompile Include="windows\fliteDll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\speech\g721.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\speech\g723_24.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\speech\g723_40.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\speech\g72x.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\speech\rateconv.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -261,6 +273,21 @@
     <ClCompile Include="lang\usenglish\usenglish.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\cst_url.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cg\cst_spamf0.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cg\cst_cg_load_voice.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cg\cst_cg_map.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cg\cst_cg_dump_voice.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Exports.def">
@@ -269,34 +296,10 @@
     <None Include="windows\ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lang\cmu_dari_lang\cmu_dari_lang.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_dari_lex\cmu_dari_lex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_dari_lex\cmu_dari_lex_lts_model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_dari_lang\cmu_dari_phrasing_cart.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="lang\cmulex\cmu_lex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lang\cmulex\cmu_lts_model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_pashto_lang\cmu_pashto_lang.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_pashto_lex\cmu_pashto_lex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_pashto_lex\cmu_pashto_lts_model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lang\cmu_pashto_lang\cmu_pashto_phrasing_cart.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\cst_alloc.h">
@@ -429,6 +432,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\flite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\speech\g72x.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\audio\native_audio.h">

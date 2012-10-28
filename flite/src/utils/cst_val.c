@@ -41,6 +41,7 @@
 #include "cst_file.h"
 #include "cst_val.h"
 #include "cst_string.h"
+#include "cst_tokenstream.h"
 
 static cst_val *new_val()
 {
@@ -236,10 +237,10 @@ void *val_void(const cst_val *v)
 
 int cst_val_consp(const cst_val *v)
 {
-    /* To keep a val cell down to 8 bytes we identify non-cons cells */
+    /* To keep a val cell down to 8 bytes we identify non-cons cells  */
     /* with non-zero values in the least significant bit of the first */
     /* address in the cell (this is a standard technique used on Lisp */
-    /* machines                                                       */
+    /* machines)                                                      */
 #if 0
     void *t;
     int t1;
@@ -274,8 +275,11 @@ const cst_val *set_cdr(cst_val *v1, const cst_val *v2)
     }
     else
     {
-	val_dec_refcount(CST_VAL_CDR(v1));
-	val_inc_refcount(v1);
+        if (CST_VAL_CDR(v1))
+        {
+            val_dec_refcount(CST_VAL_CDR(v1));
+            val_inc_refcount(v1);
+        }
 	CST_VAL_CDR(v1) = (cst_val *)v2;
     }
     return v1;
@@ -283,7 +287,7 @@ const cst_val *set_cdr(cst_val *v1, const cst_val *v2)
 
 const cst_val *set_car(cst_val *v1, const cst_val *v2)
 {
-    /* destructive set car, be careful you have a pointer to current cdr */
+    /* destructive set car, be careful you have a pointer to current car */
     
     if (!cst_val_consp(v1))
     {
@@ -321,6 +325,12 @@ void val_print(cst_file fd,const cst_val *v)
 	    p=val_cdr(p);
 	    if (p)
 		cst_fprintf(fd," ");
+            if (p && !cst_val_consp(p))  /* dotted pairs for non-list */
+            {                            
+                cst_fprintf(fd,". ");
+                val_print(fd,p);
+                break;
+            }
 	}
 	cst_fprintf(fd,")");
     }
@@ -330,7 +340,7 @@ void val_print(cst_file fd,const cst_val *v)
 }
 
 cst_val *val_reverse(cst_val *l)
-{
+{   /* destructively reverse the list */
     cst_val *n,*np,*nl;
     for (nl=0,n=l; n; nl=n,n=np)
     {
@@ -470,7 +480,7 @@ cst_val *cst_utf8_explode(const cst_string *utf8string)
     /* return a list of utf-8 characters as strings */
     const unsigned char *xxx = (const unsigned char *)utf8string;
     cst_val *chars=NULL;
-    int i, l=0;
+    int i;
     char utf8char[5];
 
     for (i=0; xxx[i]; i++)
@@ -478,25 +488,21 @@ cst_val *cst_utf8_explode(const cst_string *utf8string)
         if (xxx[i] < 0x80)  /* one byte */
         {
             sprintf(utf8char,"%c",xxx[i]);
-            l = 1;
         }
         else if (xxx[i] < 0xe0) /* two bytes */
         {
             sprintf(utf8char,"%c%c",xxx[i],xxx[i+1]);
             i++;
-            l = 2;
         }
         else if (xxx[i] < 0xff) /* three bytes */
         {
             sprintf(utf8char,"%c%c%c",xxx[i],xxx[i+1],xxx[i+2]);
             i++; i++;
-            l = 3;
         }
         else
         {
             sprintf(utf8char,"%c%c%c%c",xxx[i],xxx[i+1],xxx[i+2],xxx[i+3]);
             i++; i++; i++;
-            l = 4;
         }
         chars = cons_val(string_val(utf8char),chars);
     }
@@ -548,6 +554,29 @@ cst_string *cst_implode(const cst_val *sl)
     }
 
     return s;
+}
+
+cst_val *val_readlist_string(const char *str)
+{   /* not fully general but a good start */
+    cst_tokenstream *ts;
+    cst_val *v = NULL;
+    const char *p;
+
+    ts = ts_open_string(str,
+                        cst_ts_default_whitespacesymbols,
+                        "",
+                        "",
+                        "");
+
+    while (!ts_eof(ts))
+    {
+        p = ts_get(ts);
+        v = cons_val(string_val(p),v);
+    }
+
+    ts_close(ts);
+
+    return val_reverse(v);
 }
 
 

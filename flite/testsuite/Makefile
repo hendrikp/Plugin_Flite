@@ -47,8 +47,10 @@ SRCS = token_test_main.c hrg_test_main.c \
        lpc_test_main.c asciiS2U_main.c asciiU2S_main.c \
        lpc_test2_main.c combine_waves_main.c \
        bin2ascii_main.c record_in_noise_main.c \
-       compare_wave_main.c
+       compare_wave_main.c rfc_main.c lpc_resynth_main.c \
+       by_word_main.c
 OTHERS = kal_test_main.c
+
 FILES = Makefile $(SRCS) $(DATAFILES) $(OTHERS)
 
 LOCAL_INCLUDES = -I$(TOP)/lang/usenglish
@@ -59,6 +61,7 @@ nums_test_LIBS = -lflite_usenglish
 utt_test_LIBS = -lflite_cmulex
 lex_lookup_LIBS = -lflite_cmulex
 ldom_time_LIBS = -L/home/awb/data/ldom/time_flite/flite/lib -lcmu_time_awb -lflite_usenglish -lflite_cmulex
+by_word_LIBS = -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex
 #kal_test_LIBS = -lflite_cmu_us_kal -lflite_usenglish -lflite_cmulex \
 #	          /home/awb/src/malloc/gmalloc.o
 

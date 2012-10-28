@@ -50,24 +50,109 @@
 /*************************************************************************/
 
 #include "cst_cg.h"
+#include "cst_spamf0.h"
 #include "cst_hrg.h"
 #include "cst_utt_utils.h"
 #include "cst_audio.h"
 
-CST_VAL_REGISTER_TYPE_NODEL(cg_db,cst_cg_db)
+CST_VAL_REGISTER_TYPE(cg_db,cst_cg_db)
 
 static cst_utterance *cg_make_hmmstates(cst_utterance *utt);
 static cst_utterance *cg_make_params(cst_utterance *utt);
 static cst_utterance *cg_predict_params(cst_utterance *utt);
 static cst_utterance *cg_resynth(cst_utterance *utt);
 
+void delete_cg_db(cst_cg_db *db)
+{
+    int i,j;
+
+    if (db->freeable == 0)
+        return;  /* its in the data segment, so not freeable */
+
+    /* Woo Hoo!  We're gonna free this garbage with a big mallet */
+    /* In spite of what the const qualifiers say ... */
+    cst_free((void *)db->name);
+
+    for (i=0; db->types && db->types[i]; i++)
+        cst_free((void *)db->types[i]);
+    cst_free((void *)db->types);
+
+    for (i=0; db->f0_trees && db->f0_trees[i]; i++)
+        delete_cart((cst_cart *)(void *)db->f0_trees[i]);
+    cst_free((void *)db->f0_trees);
+
+    for (i=0; db->param_trees0 && db->param_trees0[i]; i++)
+        delete_cart((cst_cart *)(void *)db->param_trees0[i]);
+    cst_free((void *)db->param_trees0);
+
+    for (i=0; db->param_trees1 && db->param_trees1[i]; i++)
+        delete_cart((cst_cart *)(void *)db->param_trees1[i]);
+    cst_free((void *)db->param_trees1);
+
+    for (i=0; db->param_trees2 && db->param_trees2[i]; i++)
+        delete_cart((cst_cart *)(void *)db->param_trees2[i]);
+    cst_free((void *)db->param_trees2);
+
+    if (db->spamf0)
+    {
+        delete_cart((cst_cart *)(void *)db->spamf0_accent_tree);
+        delete_cart((cst_cart *)(void *)db->spamf0_phrase_tree);
+        for (i=0; i< db->num_frames_spamf0_accent; i++)
+            cst_free((void *)db->spamf0_accent_vectors[i]);
+        cst_free((void *)db->spamf0_accent_vectors);
+    }
+
+    for (i=0; i<db->num_frames0; i++)
+        cst_free((void *)db->model_vectors0[i]);
+    cst_free((void *)db->model_vectors0);
+    for (i=0; i<db->num_frames1; i++)
+        cst_free((void *)db->model_vectors1[i]);
+    cst_free((void *)db->model_vectors1);
+    for (i=0; i<db->num_frames2; i++)
+        cst_free((void *)db->model_vectors2[i]);
+    cst_free((void *)db->model_vectors2);
+
+    cst_free((void *)db->model_min);
+    cst_free((void *)db->model_range);
+
+    for (i=0; db->dur_stats && db->dur_stats[i]; i++)
+    {
+        cst_free((void *)db->dur_stats[i]->phone);
+        cst_free((void *)db->dur_stats[i]);
+    }
+    cst_free((void *)db->dur_stats);
+    delete_cart((void *)db->dur_cart);
+
+    for (i=0; db->phone_states && db->phone_states[i]; i++)
+    {
+        for (j=0; db->phone_states[i][j]; j++)
+            cst_free((void *)db->phone_states[i][j]);
+        cst_free((void *)db->phone_states[i]);
+    }
+    cst_free((void *)db->phone_states);
+
+    cst_free((void *)db->dynwin);
+
+    for (i=0; i<db->ME_num; i++)
+        cst_free((void *)db->me_h[i]);
+    cst_free((void *)db->me_h);
+
+    cst_free((void *)db);
+}
+
 /* */
 cst_utterance *cg_synth(cst_utterance *utt)
 {
+    cst_cg_db *cg_db;
+    cg_db = val_cg_db(utt_feat_val(utt,"cg_db"));
 
     cg_make_hmmstates(utt);
     cg_make_params(utt);
     cg_predict_params(utt);
+    if (cg_db->spamf0)
+    {
+	cst_spamf0(utt);
+    }
     cg_resynth(utt);
 
     return utt;
@@ -143,7 +228,7 @@ static cst_utterance *cg_make_params(cst_utterance *utt)
     cst_item *s, *mcep_parent, *mcep_frame;
     int num_frames;
     float start, end;
-    float dur_stretch;
+    float dur_stretch, tok_stretch;
 
     cg_db = val_cg_db(utt_feat_val(utt,"cg_db"));
     mcep = utt_relation_create(utt,"mcep");
@@ -155,7 +240,10 @@ static cst_utterance *cg_make_params(cst_utterance *utt)
     for (s = utt_rel_head(utt,"HMMstate"); s; s=item_next(s))
     {
         start = end;
-        end = start + (dur_stretch*cg_state_duration(s,cg_db));
+        tok_stretch = ffeature_float(s,"R:segstate.parent.R:SylStructure.parent.parent.R:Token.parent.local_duration_stretch");
+        if (tok_stretch == 0)
+            tok_stretch = 1.0;
+        end = start + (tok_stretch*dur_stretch*cg_state_duration(s,cg_db));
         item_set_float(s,"end",end);
         mcep_parent = relation_append(mcep_link, s);
         for ( ; (num_frames * cg_db->frame_advance) <= end; num_frames++ )
@@ -249,10 +337,17 @@ static void cg_smooth_F0(cst_utterance *utt,cst_cg_db *cg_db,
     for (i=0,mcep=utt_rel_head(utt,"mcep"); mcep; i++,mcep=item_next(mcep))
     {
         if (voiced_frame(mcep))
+        {
             /* scale the F0 -- which normally wont change it at all */
             param_track->frames[i][0] = 
                 (((param_track->frames[i][0]-cg_db->f0_mean)/cg_db->f0_stddev) 
                  *stddev)+mean;
+            /* Some safety checks */
+            if (param_track->frames[i][0] < 50)
+                param_track->frames[i][0] = 50;
+            if (param_track->frames[i][0] > 700)
+                param_track->frames[i][0] = 700;
+        }
         else /* Unvoice it */
             param_track->frames[i][0] = 0.0;
     }
@@ -389,7 +484,10 @@ static cst_utterance *cg_resynth(cst_utterance *utt)
 
     streaming_info_val=get_param_val(utt->features,"streaming_info",NULL);
     if (streaming_info_val)
+    {
         asi = val_audio_streaming_info(streaming_info_val);
+        asi->utt = utt;
+    }
 
     cg_db = val_cg_db(utt_feat_val(utt,"cg_db"));
     param_track = val_track(utt_feat_val(utt,"param_track"));
@@ -405,8 +503,17 @@ static cst_utterance *cg_resynth(cst_utterance *utt)
     else
         w=mlsa_resynthesis(param_track,str_track,cg_db,asi);
 
+    if (w == NULL)
+    {
+        /* Synthesis Failed, probably because it was interrupted */
+        utt_set_feat_int(utt,"Interrupted",1);
+        w = new_wave();
+    }
 
     utt_set_wave(utt,w);
 
     return utt;
 }
+
+
+

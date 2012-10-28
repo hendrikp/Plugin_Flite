@@ -3,7 +3,7 @@
 #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
 #   2000, 2001, 2002 Free Software Foundation, Inc.
 
-timestamp='2005-11-11'
+timestamp='2010-03-27'
 
 # This file is (in principle) common to ALL GNU software.
 # The presence of a machine in this file suggests that SOME GNU software
@@ -1138,6 +1138,14 @@ case $os in
 		;;
 	-wince*)
 		os=-wince
+		;;
+	-android*)
+                ## added (awb) March 27.
+		os=-android
+		;;
+	-chrome*)
+                ## added (aup) Nov 06 2011.
+		os=-chrome
 		;;
 	-osfrose*)
 		os=-osfrose

@@ -65,6 +65,20 @@ M68KCC=
 M68KCLAGS=
 WINDRES=
 
+CHROMEBIN_PREFIX=
+
+if test "$target_os" = "chrome" ; then
+    case "$TARGET_CPU" in
+	i386*)
+	    CFLAGS="$CFLAGS -m32"
+	    CHROMEBIN_PREFIX=" $CHROME_NDK/toolchain/linux_x86_newlib/bin/i686-nacl"
+	    ;;
+	x86_64*)
+	    CFLAGS="$CFLAGS -m64"
+	    CHROMEBIN_PREFIX=" $CHROME_NDK/toolchain/linux_x86_newlib/bin/x86_64-nacl"
+esac
+fi
+
 case "$target_os" in
         palmos*)
 		shared=false
@@ -132,6 +146,31 @@ dnl         ;;
                 DLLWRAP="${MINGWPREF}dllwrap"
                 NM="${MINGWPREF}nm"
         ;;
+        android*)
+                # For Android with Android NDK
+                # http://developer.android.com/sdk/ndk/index.html
+		shared=false
+                ANDROIDBIN="$ANDROID_NDK/toolchains/arm-linux-androideabi-4.4.3/prebuilt/linux-x86/bin"
+		# Use the line below to compile for ARMv5 (default)
+		CFLAGS="$CFLAGS -march=armv5te -mtune=xscale -msoft-float -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__ -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -DANDROID -I$ANDROID_NDK/platforms/android-8/arch-arm/usr/include/ "
+
+		# Use the two lines below to compile for ARMv7-A (Nexus one, Droid, etc.)
+		#CFLAGS="$CFLAGS -fpic -mthumb-interwork -ffunction-sections -funwind-tables -fstack-protector -fno-short-enums -D__ARM_ARCH_5__ -D__ARM_ARCH_5T__ -D__ARM_ARCH_5E__ -D__ARM_ARCH_5TE__  -Wno-psabi -march=armv7-a -mfloat-abi=softfp -mfpu=vfp -fno-exceptions -mthumb -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64  -I$ANDROID_NDK/platforms/android-8/arch-arm/usr/include/ -DANDROID  -Wa,--noexecstack -O2 -DNDEBUG "
+		#LDFLAGS="$LDFLAGS -Wl,--fix-cortex-a8"
+
+                CC="${ANDROIDBIN}/arm-linux-androideabi-gcc"
+                RANLIB="${ANDROIDBIN}/arm-linux-androideabi-ranlib"
+                AR="${ANDROIDBIN}/arm-linux-androideabi-ar"
+                NM="${ANDROIDBIN}/arm-linux-androideabi-nm"
+        ;;
+        chrome*)
+		shared=false
+		CFLAGS="$CFLAGS -DCST_NO_SOCKETS"
+                CC="${CHROMEBIN_PREFIX}-gcc"
+                RANLIB="${CHROMEBIN_PREFIX}-ranlib"
+                AR="${CHROMEBIN_PREFIX}-ar"
+                NM="${CHROMEBIN_PREFIX}-nm"
+        ;;
         uclinux*)
                 LDFLAGS="$LDFLAGS -Wl,-elf2flt"
         ;;
@@ -167,6 +206,24 @@ AC_SUBST(HOST_CPU)
 
 SHFLAGS=
 OTHERLIBS=
+
+withpic=false
+AC_ARG_WITH( pic, [  --with-pic           with pic ],
+        withpic=$with_pic )
+if test "x$with_pic" = "xyes"; then
+   case "$target_os" in
+	linux*)
+		CFLAGS="$CFLAGS -fPIC"
+        ;;
+	solaris*)
+		CFLAGS="$CFLAGS -fPIC"
+        ;;
+	*)
+		CFLAGS="$CFLAGS -fPIC"
+	;;
+   esac
+fi
+
 if test "$shared" = true; then
    case "$target_os" in
 	linux*|k*bsd*-gnu|gnu*)
@@ -225,11 +282,20 @@ dnl read-only mappings work.
 dnl
 AC_CHECK_FUNC(mmap,MMAPTYPE=posix)
 
+dnl Force no mmap for chrome
+if test "$target_os" = "chrome"
+then
+    MMAPTYPE=none
+fi
+
 dnl AC_CHECK_FUNC doesn't seem to work for Win32 API calls...
 if test "x$MMAPTYPE" = x; then
    case "$target_os" in
 	cygwin*|mingw*)
 		MMAPTYPE=win32
+	;;
+	android*)
+		MMAPTYPE=posix
 	;;
  	*)
 		MMAPTYPE=none
@@ -293,6 +359,16 @@ case "$target_os" in
         AUDIODEFS=-DCST_AUDIO_NONE
         AUDIOLIBS=
      ;;
+     android*)
+        AUDIODRIVER="none"
+        AUDIODEFS=-DCST_AUDIO_NONE
+        AUDIOLIBS=
+     ;;
+     chrome*)
+	AUDIODRIVER="none"
+	AUDIODEFS=-DCST_AUDIO_NONE
+	AUDIOLIBS=
+     ;;	
      *)
      ;;
 esac
@@ -302,7 +378,8 @@ dnl allow the user to override the one detected above
 dnl
 AC_ARG_WITH( audio,
 	[  --with-audio          with specific audio support (none linux freebsd etc) ],
-        AUDIODRIVER=$with_audio )
+        AUDIODRIVER=$with_audio
+	AUDIODEFS="" )
 
 if test "x$AUDIODEFS" = x; then
     case "$AUDIODRIVER" in
@@ -314,6 +391,11 @@ if test "x$AUDIODEFS" = x; then
             AUDIODRIVER="alsa"
 	    AUDIODEFS=-DCST_AUDIO_ALSA
             AUDIOLIBS=-lasound
+	    ;;
+	pa|pulseaudio)
+            AUDIODRIVER="pulseaudio"
+	    AUDIODEFS=-DCST_AUDIO_PULSEAUDIO
+            AUDIOLIBS='-lpulse-simple -lpulse'
 	    ;;
 	*bsd)
 	    AUDIODRIVER=oss
