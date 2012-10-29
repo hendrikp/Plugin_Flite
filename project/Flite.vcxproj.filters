@@ -16,6 +16,9 @@
     <Filter Include="Flownodes">
       <UniqueIdentifier>{41d33271-cc5c-4e38-af4c-f17a9364b1d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Phonemes">
+      <UniqueIdentifier>{829785ab-89a3-436c-9a97-f165b569cac3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\readme.md" />
@@ -35,6 +38,9 @@
     <ClCompile Include="..\src\Flownodes\CFlowFliteNode.cpp">
       <Filter>Flownodes</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\CFlitePhonemes.cpp">
+      <Filter>Phonemes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StdAfx.h">
@@ -48,6 +54,9 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\CFlitePhonemes.h">
+      <Filter>Phonemes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -43,5 +43,14 @@ EXPORTS
 	audio_stream_chunk
 	audio_streaming_info_val
 	new_audio_streaming_info
-	
-	
+    feat_set_string
+    feat_set
+    feat_set_float
+    new_features
+    relation_head
+    utt_relation
+    item_next
+    item_feat_string
+    ffeature_string
+    delete_utterance
+    delete_features

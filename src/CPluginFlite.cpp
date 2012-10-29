@@ -3,13 +3,16 @@
 #include <StdAfx.h>
 #include <CPluginFlite.h>
 
-#include <../flite/include/flite.h>
-
+#include <CFlitePhonemes.h>
 #include <PMUtils.hpp>
 
-extern "C" {
+extern "C"
+{
+#include <flite.h>
+
     cst_voice* register_cmu_us_rms( const char* voxdir );
     void unregister_cmu_us_rms( cst_voice* v );
+
     cst_voice* register_cmu_us_slt( const char* voxdir );
     void unregister_cmu_us_slt( cst_voice* v );
 }
@@ -177,6 +180,7 @@ namespace FlitePlugin
 
         if ( v )
         {
+            //gPlugin->LogAlways( "Phonemes: %s", getPhonemes( sText.c_str() ).c_str() );
             return flite_text_to_speech( sText, v, "play" );
         }
 
