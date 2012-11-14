@@ -1,8 +1,6 @@
-Flite Plugin for CryEngine SDK
-=====================================
+Flite Plugin for CryEngine
+==========================
 Use Text to Speech as placeholder for later real sounds for dialogs or keep it for computer voice or robots.
-
-For redistribution please see license.txt.
 
 Relies on [Flite Text to Speech Engine](http://www.speech.cs.cmu.edu/flite) which is a faster and lightweight version of Festival.
 
@@ -12,8 +10,8 @@ Extract the files to your Cryengine SDK Folder so that the Code and BinXX/Plugin
 
 The plugin manager will automatically load up the plugin when the game/editor is restarted or if you directly load it.
 
-CVars
-=====
+CVars / Commands
+================
 * ```fl_speak <Text..>```
   Will speak the text supplied
 
@@ -28,3 +26,7 @@ Flownodes
   * In ```Speak``` Speak the text now
   * In ```sText``` Text to speak
   * In ```Voice``` Voice to use
+
+Building / Compiling
+====================
+* Either use Visual Studio 
