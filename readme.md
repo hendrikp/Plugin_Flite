@@ -5,7 +5,7 @@ Use Text to Speech as placeholder for later recording for dialogs or keep it for
 Relies on [Flite Text to Speech Engine](http://www.speech.cs.cmu.edu/flite) which is a faster and lightweight version of Festival.
 
 Installation / Integration
-==========================+
+==========================
 Use the Installer or extract the files to your CryEngine SDK Folder so that the Code and BinXX/Plugins directory match up.
 
 This plugin requires the Plugin SDK to be installed.
