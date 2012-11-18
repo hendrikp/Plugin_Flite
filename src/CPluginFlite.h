@@ -48,7 +48,7 @@ namespace FlitePlugin
 
             const char* GetCategory() const
             {
-                return "Other";
+                return "Sound";
             };
 
             const char* ListAuthors() const

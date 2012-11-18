@@ -19,11 +19,22 @@
     <Filter Include="Phonemes">
       <UniqueIdentifier>{829785ab-89a3-436c-9a97-f165b569cac3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Installer">
+      <UniqueIdentifier>{09216bba-8fb1-4f77-9da3-17f5c790f53b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\readme.md" />
     <None Include="..\license.txt" />
     <None Include="..\authors.txt" />
+    <None Include="..\tools\build_installer.bat">
+      <Filter>Installer</Filter>
+    </None>
+    <None Include="..\tools\Flite_Installer.nsi">
+      <Filter>Installer</Filter>
+    </None>
+    <None Include="..\changelog.md" />
+    <None Include="..\latestredist.info" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\StdAfx.cpp">

@@ -1,5 +1,5 @@
 Flite Plugin
-==================================================================================
+============
 Copyright (c) 2012, The authors of the Flite Plugin project
 All rights reserved.
 
@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 [This is the BSD 2-Clause License, http://opensource.org/licenses/BSD-2-Clause]
 
 fliteDll
-==================================================================================
+========
 Flite is free software.
 
 We have kept the core code to BSD-like copyright, thus the system is
