@@ -40,7 +40,7 @@ namespace FlitePlugin
                     InputPortConfig_Void( "Speak", _HELP( "Speak the text" ) ),
                     InputPortConfig<string>( "sText", "", _HELP( "Text to speak" ), "sText", _UICONFIG( "" ) ),
                     InputPortConfig<int>( "Voice", 1, _HELP( "Voice to use" ), "nVoice", _UICONFIG( "enum_int:"FLITE_VOICE_SLT"=1,"FLITE_VOICE_RMS"=2" ) ),
-                    {0},
+                    InputPortConfig_Null()
                 };
 
                 config.pInputPorts = inputs;
