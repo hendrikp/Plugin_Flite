@@ -1,3 +1,10 @@
+Flite Plugin 2.0 (??.08.2013)
+---------------------------------
+Stable Release for CryEngine
+
+Features:
+- Realtime Lipsync
+
 Flite Plugin 1.1.1.0 (02.03.2013)
 ---------------------------------
 Stable Release for CryEngine 3.4.5 (32/64 bit)

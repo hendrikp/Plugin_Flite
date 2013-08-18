@@ -158,7 +158,7 @@ namespace FlitePlugin
     * @param sVoice Voice to use
     * @return length
     */
-    float BlockingSpeak( string sText, string sVoice = FLITE_VOICE_SLT )
+    float BlockingSpeak( string sText, string sVoice = FLITE_VOICE_SLT, void* pStream = NULL )
     {
         if ( !sText )
         {
@@ -180,8 +180,13 @@ namespace FlitePlugin
 
         if ( v )
         {
-            //gPlugin->LogAlways( "Phonemes: %s", getPhonemes( sText.c_str() ).c_str() );
-            return flite_text_to_speech( sText, v, "play" );
+            if ( !pStream )
+            {
+                gPlugin->LogAlways( "Phonemes: %s", getPhonemes( sText.c_str() ).c_str() );
+            }
+
+            return flite_text_to_speech_phenome( sText, v, "play", pStream );
+            //return flite_text_to_speech( sText, v, "play" );
         }
 
         return 0;
@@ -191,6 +196,7 @@ namespace FlitePlugin
     {
         string sText;
         string sVoice;
+        void* pqPhonemeStream;
     };
 
     /**
@@ -200,13 +206,13 @@ namespace FlitePlugin
     unsigned int __stdcall _AsyncSpeak( void* pData )
     {
         SAsyncSpeakData* _pData = static_cast<SAsyncSpeakData*>( pData );
-        BlockingSpeak( _pData->sText, _pData->sVoice );
+        BlockingSpeak( _pData->sText, _pData->sVoice, _pData->pqPhonemeStream );
         delete _pData;
         return 0;
     }
 
     // plugin concrete interface implementation
-    void CPluginFlite::AsyncSpeak( const char* sText, const char* sVoice )
+    void CPluginFlite::AsyncSpeak( const char* sText, const char* sVoice, void* pStream )
     {
         if ( !sText )
         {
@@ -217,11 +223,13 @@ namespace FlitePlugin
         SAsyncSpeakData* pData = new SAsyncSpeakData();
         pData->sText = SAFESTR( sText );
         pData->sVoice = SAFESTR( sVoice );
+        pData->pqPhonemeStream = pStream;
 
         // start thread
         unsigned int nThreadId = 0;
         void* pThread = ( void* )_beginthreadex( NULL, 0, _AsyncSpeak, static_cast<void*>( pData ), CREATE_SUSPENDED, &nThreadId );
         assert( pThread );
+        SetThreadPriority( ( HANDLE )pThread, THREAD_PRIORITY_LOWEST );
         ResumeThread( ( HANDLE )pThread );
     }
 }

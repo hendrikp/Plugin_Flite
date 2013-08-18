@@ -12,6 +12,15 @@
 */
 namespace FlitePlugin
 {
+    struct SPhenomeTiming
+    {
+        string sName;
+        float fStart;
+        float fEnd;
+        float fDuration;
+        float fWeight;
+    };
+
     /**
     * @brief plugin Flite concrete interface
     */
@@ -26,6 +35,6 @@ namespace FlitePlugin
         * @brief Speak a text asynchronously
         * @param sText Text to Speak
         */
-        virtual void AsyncSpeak( const char* sText, const char* sVoice = FLITE_VOICE_SLT ) = 0;
+        virtual void AsyncSpeak( const char* sText, const char* sVoice = FLITE_VOICE_SLT, void* pStream = NULL ) = 0;
     };
 };

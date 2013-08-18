@@ -76,7 +76,7 @@ namespace FlitePlugin
                 return static_cast<IPluginBase*>( this );
             };
 
-            void AsyncSpeak( const char* sText, const char* sVoice = FLITE_VOICE_SLT );
+            void AsyncSpeak( const char* sText, const char* sVoice = FLITE_VOICE_SLT, void* pStream = NULL );
     };
 
     extern CPluginFlite* gPlugin;

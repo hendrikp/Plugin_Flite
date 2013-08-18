@@ -4,6 +4,8 @@ Use Text to Speech as placeholder for later recording for dialogs or keep it for
 
 Relies on [Flite Text to Speech Engine](http://www.speech.cs.cmu.edu/flite) which is a faster and lightweight version of Festival.
 
+Can be combined with the animation plugin to provide realtime lipsync for characters.
+
 Installation / Integration
 ==========================
 Use the Installer or extract the files to your CryEngine SDK Folder so that the Code and BinXX/Plugins directory match up.
@@ -27,6 +29,10 @@ Flownodes
   * In ```Speak``` Speak the text now
   * In ```sText``` Text to speak
   * In ```Voice``` Voice to use
+  * Out ```Phoneme```Morph Name
+  * Out ```Weight``` Morph Weight
+  * Out ```FadeDuration``` Fade in Seconds
+  * Out ```Duration``` Duration in Seconds
 
 Contributing
 ============

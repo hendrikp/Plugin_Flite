@@ -51,6 +51,7 @@ EXPORTS
     utt_relation
     item_next
     item_feat_string
+    item_feat_float
     ffeature_string
     delete_utterance
     delete_features

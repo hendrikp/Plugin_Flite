@@ -11,5 +11,10 @@ extern "C"
 
 namespace FlitePlugin
 {
+
+
     string getPhonemes( const char* sText );
+    float flite_text_to_speech_phenome( const char* text,
+                                        cst_voice* voice,
+                                        const char* outtype, void* pStream = NULL );
 }

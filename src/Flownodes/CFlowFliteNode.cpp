@@ -4,17 +4,31 @@
 #include <Nodes/G2FlowBaseNode.h>
 
 #include <CPluginFlite.h>
+#include <MultiThread_Containers.h>
 
 namespace FlitePlugin
 {
     class CFlowFliteNode :
         public CFlowBaseNode<eNCT_Instanced>
     {
+
+            double m_fCurrentTime;
+            SPhenomeTiming m_phoCurrentPhoneme;
+            CryMT::queue<SPhenomeTiming> m_qPhonemeStream;
+
             enum EInputPorts
             {
                 EIP_SPEAK = 0,
                 EIP_TEXT,
                 EIP_VOICE,
+            };
+
+            enum EOutputPorts
+            {
+                EOP_PHONEME = 0,
+                EOP_WEIGHT,
+                EOP_FADEDURATION,
+                EOP_DURATION,
             };
 
         public:
@@ -43,7 +57,17 @@ namespace FlitePlugin
                     InputPortConfig_Null()
                 };
 
+                static const SOutputPortConfig outputs[] =
+                {
+                    OutputPortConfig<string>( "Phoneme", _HELP( "Morph Name" ) ),
+                    OutputPortConfig<float>( "Weight", _HELP( "Morph Weight" ) ),
+                    OutputPortConfig<float>( "FadeDuration", _HELP( "Fade in Seconds" ) ),
+                    OutputPortConfig<float>( "Duration", _HELP( "Duration in Seconds" ) ),
+                    OutputPortConfig_Null(),
+                };
+
                 config.pInputPorts = inputs;
+                config.pOutputPorts = outputs;
                 config.sDescription = _HELP( PLUGIN_CONSOLE_PREFIX " Text To Speech" );
 
                 config.SetCategory( EFLN_APPROVED );
@@ -63,9 +87,35 @@ namespace FlitePlugin
                                 sVoice = FLITE_VOICE_RMS;
                             }
 
-                            gPlugin->AsyncSpeak( GetPortString( pActInfo, EIP_TEXT ), sVoice );
+                            m_fCurrentTime = 0;
+                            m_qPhonemeStream.clear();
+                            gPlugin->AsyncSpeak( GetPortString( pActInfo, EIP_TEXT ), sVoice, ( void* )&m_qPhonemeStream );
+
+                            pActInfo->pGraph->SetRegularlyUpdated( pActInfo->myID, true );
                         }
 
+                        break;
+
+                    case eFE_Update:
+                        {
+                            if ( !m_qPhonemeStream.empty() )
+                            {
+                                m_fCurrentTime += gEnv->pTimer->GetFrameTime();
+
+                                m_phoCurrentPhoneme = m_qPhonemeStream.front();
+
+                                if ( m_fCurrentTime >= m_phoCurrentPhoneme.fStart )
+                                {
+                                    if ( m_qPhonemeStream.try_pop( m_phoCurrentPhoneme ) )
+                                    {
+                                        ActivateOutput<float>( pActInfo, EOP_DURATION, m_phoCurrentPhoneme.fDuration );
+                                        ActivateOutput<float>( pActInfo, EOP_FADEDURATION, 0.1 );
+                                        ActivateOutput<float>( pActInfo, EOP_WEIGHT, m_phoCurrentPhoneme.fWeight );
+                                        ActivateOutput<string>( pActInfo, EOP_PHONEME, m_phoCurrentPhoneme.sName );
+                                    }
+                                }
+                            }
+                        }
                         break;
                 }
             }
