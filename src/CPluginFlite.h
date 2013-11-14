@@ -67,7 +67,7 @@ namespace FlitePlugin
 
             void* GetConcreteInterface( const char* sInterfaceVersion )
             {
-                return static_cast < IPluginFlite* > ( this );
+                return static_cast <IPluginFlite*>( this );
             };
 
             // IPluginFlite
