@@ -159,8 +159,7 @@ copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
 copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd $(ProjectDir)/../tools
-stylecode.bat</Command>
+      <Command>call "$(ProjectDir)..\tools\stylecode.bat" "$(ProjectDir)..\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -193,8 +192,7 @@ copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
 copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd $(ProjectDir)/../tools
-stylecode.bat</Command>
+      <Command>call "$(ProjectDir)..\tools\stylecode.bat" "$(ProjectDir)..\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -231,8 +229,7 @@ copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
 copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd $(ProjectDir)/../tools
-stylecode.bat</Command>
+      <Command>call "$(ProjectDir)..\tools\stylecode.bat" "$(ProjectDir)..\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -267,8 +264,7 @@ copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_rms.dll" "$(OutDir)"
 copy "$(ProjectDir)..\flite\lib\$(Platform)\cmu_us_slt.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>cd $(ProjectDir)/../tools
-stylecode.bat</Command>
+      <Command>call "$(ProjectDir)..\tools\stylecode.bat" "$(ProjectDir)..\"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
